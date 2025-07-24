@@ -1,0 +1,29 @@
+services:
+  crondog-respawn:
+    build: .
+    container_name: crondog-respawn
+    restart: unless-stopped
+    # Uncomment the next line if using Docker Desktop (macOS/Windows)
+    user: root
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    environment:
+      # Optional: Uncomment and set your project name
+      # - CRON_COMPOSE_PROJECT_LABEL=myproject
+      - CRON_CONTAINER_LABEL=auto.restart
+      - CRON_SCHEDULE_LABEL=auto.schedule
+    # Ensure the container runs with the same group ID as the host docker group
+    # This will be set dynamically based on the host's docker group GID
+    # Note: group_add is not needed when running as root (Docker Desktop)
+    group_add:
+      - "${DOCKER_GID:-998}"  # Use DOCKER_GID env var or fallback to 998
+
+  # Example service with auto-restart enabled
+  # Uncomment and customize as needed
+  example-service:
+    image: nginx:alpine
+    container_name: example-service
+    restart: unless-stopped
+    labels:
+      - "auto.restart=true"
+      - "auto.schedule=*/2 * * * *" # Example cron schedule
