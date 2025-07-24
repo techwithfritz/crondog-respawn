@@ -12,6 +12,7 @@ services:
       # - CRON_COMPOSE_PROJECT_LABEL=myproject
       - CRON_CONTAINER_LABEL=auto.restart
       - CRON_SCHEDULE_LABEL=auto.schedule
+      - CRON_TIMEOUT_LABEL=auto.timeout
     # Ensure the container runs with the same group ID as the host docker group
     # This will be set dynamically based on the host's docker group GID
     # Note: group_add is not needed when running as root (Docker Desktop)
@@ -26,4 +27,5 @@ services:
     restart: unless-stopped
     labels:
       - "auto.restart=true"
+      - "auto.timeout=20"
       - "auto.schedule=*/2 * * * *" # Example cron schedule

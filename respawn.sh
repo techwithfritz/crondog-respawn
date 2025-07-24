@@ -43,17 +43,24 @@ log_message() {
 # Function to restart a container
 restart_container() {
     local container_name="$1"
+    local timeout="${2:-$CRON_DEFAULT_STOP_TIMEOUT}"
     
     if [ -z "$container_name" ]; then
         log_message "ERROR" "Container name not provided"
         exit 1
     fi
     
+    # Validate timeout is a positive integer
+    if ! echo "$timeout" | grep -q '^[0-9]\+$' || [ "$timeout" -le 0 ]; then
+        log_message "WARN" "Invalid timeout value '$timeout', using default: $CRON_DEFAULT_STOP_TIMEOUT"
+        timeout="$CRON_DEFAULT_STOP_TIMEOUT"
+    fi
+    
     # Log the restart attempt
-    log_message "INFO" "Restarting container: $container_name"
+    log_message "INFO" "Restarting container: $container_name (timeout: ${timeout}s)"
     
     # Attempt to restart the container with the configured timeout
-    if docker restart -t "$CRON_DEFAULT_STOP_TIMEOUT" "$container_name" >/dev/null 2>&1; then
+    if docker restart -t "$timeout" "$container_name" >/dev/null 2>&1; then
         log_message "INFO" "SUCCESS restart container: $container_name"
         exit 0
     else
@@ -66,12 +73,13 @@ restart_container() {
 main() {
     # Check if container name is provided as argument
     if [ $# -eq 0 ]; then
-        log_message "ERROR" "Usage: $0 <container_name>"
+        log_message "ERROR" "Usage: $0 <container_name> [timeout]"
         exit 1
     fi
     
     container_name="$1"
-    restart_container "$container_name"
+    timeout="$2"
+    restart_container "$container_name" "$timeout"
 }
 
 # Run main function with all arguments

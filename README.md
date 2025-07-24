@@ -63,6 +63,7 @@ services:
 |----------|---------|-------------|
 | `CRON_CONTAINER_LABEL` | `cron.restart` | Label to identify containers for restart |
 | `CRON_SCHEDULE_LABEL` | `cron.schedule` | Label containing the cron schedule |
+| `CRON_TIMEOUT_LABEL` | `cron.timeout` | Label containing the custom timeout |
 | `CRON_COMPOSE_PROJECT_LABEL` | _(empty)_ | Filter by Docker Compose project name |
 | `CRON_DEFAULT_STOP_TIMEOUT` | `10` | Default timeout (seconds) when stopping containers |
 | `CRON_MONITOR_INTERVAL` | `30` | Interval (seconds) for monitoring container changes |
@@ -80,7 +81,7 @@ Add these labels to containers you want to restart:
 
 #### Optional Labels
 
-- **`auto.stop_timeout=30`** - Custom stop timeout in seconds
+- **`auto.timeout=30`** - Custom stop timeout in seconds
 
 ### Cron Schedule Examples
 

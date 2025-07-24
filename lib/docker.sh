@@ -173,6 +173,30 @@ get_container_cron_schedule() {
     fi
 }
 
+# Get timeout value for a specific container
+get_container_timeout() {
+    local container_id="$1"
+    
+    if [ -z "$container_id" ]; then
+        echo "$CRON_DEFAULT_STOP_TIMEOUT"
+        return 1
+    fi
+    
+    local timeout_value=$(docker inspect --format "{{ index .Config.Labels \"$CRON_TIMEOUT_LABEL\" }}" "$container_id" 2>/dev/null || echo "")
+    
+    if [ -z "$timeout_value" ] || [ "$timeout_value" = "<no value>" ]; then
+        echo "$CRON_DEFAULT_STOP_TIMEOUT"
+    else
+        # Validate the timeout is a positive integer
+        if echo "$timeout_value" | grep -q '^[0-9]\+$' && [ "$timeout_value" -gt 0 ]; then
+            echo "$timeout_value"
+        else
+            log_warn_with_prefix "docker" "Invalid timeout value for container $container_id, using default"
+            echo "$CRON_DEFAULT_STOP_TIMEOUT"
+        fi
+    fi
+}
+
 # Test Docker connectivity (for monitoring loop)
 test_docker_connectivity() {
     docker version >/dev/null 2>&1

@@ -60,10 +60,16 @@ check_cron_system() {
 generate_container_cron_entry() {
     local container_id="$1"
     local container_name="$2"
+    local timeout="$3"
     
     if [ -z "$container_id" ] || [ -z "$container_name" ]; then
         log_error_with_prefix "cron" "Missing container ID or name for cron entry generation"
         return 1
+    fi
+    
+    # Use provided timeout or get it from container labels
+    if [ -z "$timeout" ]; then
+        timeout=$(get_container_timeout "$container_id")
     fi
     
     local cron_schedule=$(get_container_cron_schedule "$container_id")
@@ -76,7 +82,7 @@ generate_container_cron_entry() {
     
     cat << EOF
 # Respawn task for container: $container_name
-$cron_schedule /respawn.sh $escaped_container_name > /proc/1/fd/1 2>/proc/1/fd/2
+$cron_schedule /respawn.sh $escaped_container_name $timeout > /proc/1/fd/1 2>/proc/1/fd/2
 EOF
 }
 
@@ -104,8 +110,11 @@ generate_crontab() {
             local container_id="${container_info%%:*}"
             local container_name="${container_info#*:}"
             
+            # Get timeout for this container
+            local timeout=$(get_container_timeout "$container_id")
+            
             # Generate and append cron entry
-            if ! generate_container_cron_entry "$container_id" "$container_name" >> "$temp_crontab"; then
+            if ! generate_container_cron_entry "$container_id" "$container_name" "$timeout" >> "$temp_crontab"; then
                 log_error_with_prefix "cron" "Failed to generate cron entry for container: $container_name"
                 continue
             fi
