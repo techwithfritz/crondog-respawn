@@ -170,6 +170,7 @@ crondog-respawn/
 ├── Dockerfile              # Container definition
 ├── docker-entrypoint      # Main entry point script
 ├── docker-compose.yml     # Basic setup
+├── respawn.sh              # Container restart script (called by cron)
 ├── setup.sh               # Permission setup script
 ├── test.sh                # Test suite
 └── lib/                   # Modular libraries

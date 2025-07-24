@@ -30,7 +30,7 @@
 
 # Initialize the watchdog system
 initialize_watchdog() {
-    log "Starting scheduler watchdog for Docker containers with label: $CRON_CONTAINER_LABEL"
+    log "Starting CronDog for Docker containers with label: $CRON_CONTAINER_LABEL"
     log "Monitor interval: ${CRON_MONITOR_INTERVAL} seconds"
     
     # Check Docker connectivity
@@ -50,7 +50,7 @@ initialize_watchdog() {
         return 1
     fi
     
-    log "Watchdog initialization completed successfully"
+    log "CronDog initialization completed successfully"
     return 0
 }
 

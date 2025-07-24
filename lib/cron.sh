@@ -75,8 +75,8 @@ generate_container_cron_entry() {
     fi
     
     cat << EOF
-# Restart job for container: $container_name
-$cron_schedule /bin/sh -c "echo \$(date '$DATE_FORMAT') [cron-restart] Restarting container: $escaped_container_name > /proc/1/fd/1 2>/proc/1/fd/2 && docker restart $escaped_container_name > /dev/null 2>&1; if [ \$? -eq 0 ]; then echo \$(date '$DATE_FORMAT') [cron-restart] INFO: SUCCESS restart container: $escaped_container_name > /proc/1/fd/1 2>&1; else echo \$(date '$DATE_FORMAT') [cron-restart] ERROR: FAILED restart container: $escaped_container_name > /proc/1/fd/1 2>&1; fi"
+# Respawn task for container: $container_name
+$cron_schedule /respawn.sh $escaped_container_name > /proc/1/fd/1 2>/proc/1/fd/2
 EOF
 }
 
@@ -178,7 +178,7 @@ update_crontab_if_changed() {
     if [ "$new_checksum" != "$old_checksum" ]; then
         # Count current containers for logging
         if [ -s "$temp_crontab" ]; then
-            container_count=$(grep -c "^# Restart job for container:" "$temp_crontab" 2>/dev/null || echo "0")
+            container_count=$(grep -c "^# Respawn task for container:" "$temp_crontab" 2>/dev/null || echo "0")
         fi
         
         log_with_prefix "cron" "Container configuration changed, updating crontab... (found $container_count container(s))"

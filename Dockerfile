@@ -24,6 +24,7 @@ ENV CRON_CONTAINER_LABEL=cron.restart \
 # Copy entrypoint script and set proper permissions
 ADD lib/ lib/
 COPY --chmod=755 docker-entrypoint /docker-entrypoint
+COPY --chmod=755 respawn.sh /respawn.sh
 
 # Add health check that matches the actual service
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
